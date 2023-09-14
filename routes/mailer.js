@@ -30,7 +30,8 @@ const mailer = () => {
                     service: 'gmail',
                     auth: {
                         user: sender,
-                        pass: process.env.EmailPassKey
+                        pass: "cuoxmwypdlceucfc"
+                        // pass: process.env.EmailPassKey
                     },
                     port: 465,
                     host: "smtp.gmail.com",
