@@ -133,7 +133,7 @@
                 </tr>
             </table>
             <div class="billDetails">
-                <p class="dp">Phone         :  <%= billInfo.name %></p>
+                <p class="dp">Customer Name        :  <%= billInfo.name %></p>
                 <p class="dp">Company Name  :  <%= billInfo.cmp %></p>
                 <p class="dp">Address       :  <%= billInfo.address %></p>
                 <p class="dp">[ <%= billInfo.city %> , <%= billInfo.pin %> ]</p>
@@ -146,23 +146,28 @@
             <table class="billInfoTable">
                 <tr>
                     <th>Description</th>
-                    <th>Amount</th>
+                    <th>MRP</th>
+                    <th>Price</th>
+
                 </tr>
 
                 <% for(let i = 0 ; i < serviceCharges.length ; i++){ %>
                         <tr>
                             <td class="billInfoTableTd">
-                                <%= serviceCharges[i].service %>
+                                <%= serviceCharges[i].Model %>
                             </td>
                             <td class="billInfoTableTd">
-                                <%= serviceCharges[i].amount %>
+                                <%= serviceCharges[i].MRP %>
+                            </td>
+                            <td>
+                                <%= serviceCharges[i].Price %>
                             </td>
                         </tr>
                     <% } %>
 
                 <tr>
                     <th>Thank you for your order !</th>
-                    <th>Total : 1200</th>
+                    <th>Total : ₹ <%= billInfo.TotalAmount %></th>
                 </tr>
             </table>
         </div>

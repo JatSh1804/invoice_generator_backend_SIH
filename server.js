@@ -14,23 +14,20 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.use(cors())
-// public access
+    // public access
 app.use(express.static(path.join(__dirname, 'public')))
-
-
-
 
 const managerPDF = require("./routes/pdf_manager")
 const auth = require("./routes/auth/auth")
 const create_invoice = require("./routes/create_invoice")
 
-app.use('/api/v1/' , managerPDF);
-app.use('/api/v1/' , auth);
-app.use('/api/v1/' , create_invoice);
+app.use('/api/v1/', managerPDF);
+app.use('/api/v1/', auth);
+app.use('/api/v1/', create_invoice);
 
-app.get("/" , (req,res)=>{
+app.get("/", (req, res) => {
     res.json({
-        status : true,
+        status: true,
     })
 })
 
