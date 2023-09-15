@@ -1,7 +1,5 @@
 const app = require('express').Router();
 const ejs = require('ejs');
-const { PDFDocument } = require('pdf-lib');
-const CDP = require('chrome-remote-interface')
 const pdf = require('html-pdf')
 
 const mailer = require("./mailer")
