@@ -1,6 +1,7 @@
 const app = require('express').Router();
 const ejs = require('ejs');
 const pdf = require('html-pdf')
+const { v4: uuid4 } = require('uuid')
 
 const mailer = require("./mailer")
 
@@ -46,7 +47,7 @@ app.get('/generatePdf/:emailto' , (req,res)=>{
                 pin : "872683",
                 contactNumber : "+91 8784892324"
             },
-            invoiceId : "91297379813",
+            invoiceId : uuid4(),
             date : formattedDate,
             billInfo : {
                 name : "Rahul Singh",
@@ -55,7 +56,7 @@ app.get('/generatePdf/:emailto' , (req,res)=>{
                 city : "Mumbai",
                 pin : "111092",
                 phone : "917397912",
-                email : "test@gmail.com"
+                email : "codebuddysync@gmail.com"
 
             },
 
