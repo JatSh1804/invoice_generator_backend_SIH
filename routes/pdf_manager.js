@@ -3,7 +3,9 @@ const ejs = require('ejs');
 const pdf = require('html-pdf')
 const { v4: uuid4 } = require('uuid')
 
-const mailer = require("./mailer")
+const mailer = require("../controller/mailer")
+const Invoice = require("../config/models/Invoice")
+const User = require("../config/models/User")
 
 
 function formatDateToYYMMDD() {
@@ -17,8 +19,8 @@ function formatDateToYYMMDD() {
   
   
 
-app.get('/generatePdf/:emailto' , (req,res)=>{
-    const {emailto} = req.params
+app.get('/generatePdf/:userid' , async(req,res)=>{
+    const {userid} = req.params
     const {
         cmpName ,
         cmpAddress,
@@ -36,53 +38,73 @@ app.get('/generatePdf/:emailto' , (req,res)=>{
         billEmail
     } = req.body;
     try {
-
+        const userData = await User.findOne({_id : userid})
         const formattedDate = formatDateToYYMMDD();
-
-        const data = {
-            company : {
+        const invoiceId = uuid4()
+        const company = {
                 name : "Amazon Web Exchange",
                 address : "312 street New York Times",
                 city : "london",
                 pin : "872683",
                 contactNumber : "+91 8784892324"
+        }
+
+        const billInfo = {
+            name : userData.username,
+            cmp : "Jio Pvt LTD",
+            address : "Mumbai Road",
+            city : "Mumbai",
+            pin : "111092",
+            phone : "917397912",
+            email : userData.email
+        }
+
+        const serviceCharges = [
+            {
+                service : "Service Fee",
+                amount : 300
             },
-            invoiceId : uuid4(),
+
+            {
+                service : "labour % hours at $75/hr",
+                amount : 900
+            },
+
+            {
+                service : "New Client Discount",
+                amount : -60
+            },
+
+            {
+                service : "Tax (4.25% after discount)",
+                amount : 100
+            }
+        ]
+
+        const invoiceData = new Invoice({
+            username : userData.username,
+            email : userData.email,
+            userid : userid,
             date : formattedDate,
-            billInfo : {
-                name : "Rahul Singh",
-                cmp : "Jio Pvt LTD",
-                address : "Mumbai Road",
-                city : "Mumbai",
-                pin : "111092",
-                phone : "917397912",
-                email : "codebuddysync@gmail.com"
+            company,
+            billInfo,
+            invoiceId,
+            serviceCharges
 
-            },
+        })
 
-            serviceCharges : [
-                {
-                    service : "Service Fee",
-                    amount : 300
-                },
+        const invoiceRes = await invoiceData.save()
 
-                {
-                    service : "labour % hours at $75/hr",
-                    amount : 900
-                },
-
-                {
-                    service : "New Client Discount",
-                    amount : -60
-                },
-
-                {
-                    service : "Tax (4.25% after discount)",
-                    amount : 100
-                }
-            ]
+        const data = {
+            company ,
+            invoiceId,
+            date : formattedDate,
+            billInfo,
+            serviceCharges
           
         };
+
+        await User.updateOne({ _id : userid}, { $push: { invoices: invoiceRes._id.toString() } })
     
         ejs.renderFile('views/invoice.ejs', data, async(err, htmlContent) => {
           if (err) {
@@ -100,7 +122,7 @@ app.get('/generatePdf/:emailto' , (req,res)=>{
                 res.setHeader('Content-Type', 'application/pdf');
                 res.setHeader('Content-Disposition', 'inline; filename=output.pdf');
                 res.send(buffer);
-                mailer().send_mail(buffer , emailto).then((res) => {
+                mailer().send_mail(buffer , userData.email).then((res) => {
                     console.log(res);
                 }).catch((err) => {
                     console.error(err);
