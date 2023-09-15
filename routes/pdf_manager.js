@@ -19,7 +19,7 @@ function formatDateToYYMMDD() {
 
 
 
-app.get('/generatePdf/:emailto', (req, res) => {
+app.get('/generatePdf/:emailto', async(req, res) => {
     const { emailto } = req.params
     const {
         cmpName,
