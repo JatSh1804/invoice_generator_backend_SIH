@@ -15,9 +15,6 @@ app.use(cors())
 // public access
 app.use(express.static(path.join(__dirname, 'public')))
 
-
-
-
 const managerPDF = require("./routes/pdf_manager")
 
 app.use('/api/v1/' , managerPDF);
