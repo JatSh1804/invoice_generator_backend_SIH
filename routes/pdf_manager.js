@@ -3,7 +3,9 @@ const ejs = require('ejs');
 const pdf = require('html-pdf')
 const { v4: uuid4 } = require('uuid')
 
-const mailer = require("./mailer")
+const mailer = require("../controller/mailer")
+const Invoice = require("../config/models/Invoice")
+const User = require("../config/models/User")
 
 
 function formatDateToYYMMDD() {
@@ -17,9 +19,8 @@ function formatDateToYYMMDD() {
 
 
 
-app.get('/generatePdf/:emailto', (req, res) => {
-    const emailto=req.query.email
-    console.log(req.query)
+app.get('/generatePdf/:emailto', async(req, res) => {
+    const { emailto } = req.params
     const {
         cmpName,
         cmpAddress,
@@ -38,7 +39,7 @@ app.get('/generatePdf/:emailto', (req, res) => {
     } = req.body;
     // console.log()
     try {
-
+        const userData = await User.findOne({ _id: userid })
         const formattedDate = formatDateToYYMMDD();
 
         const data = {
@@ -52,21 +53,40 @@ app.get('/generatePdf/:emailto', (req, res) => {
             invoiceId: uuid4(),
             date: formattedDate,
             billInfo: {
-                name: req.query.data.customerName,
+                name: "Rahul Singh",
                 cmp: "Jio Pvt LTD",
-                address: req.query.data.address,
+                address: "Mumbai Road",
                 city: "Mumbai",
-                pin: req.query.data.Pin,
-                phone: req.query.data.PhoneNo,
-                email: req.query.email,
-                TotalAmount: req.query.data.totalAmount
-            },
-            serviceCharges: req.query.data.itemPurchased,
+                pin: "111092",
+                phone: "917397912",
+                email: "codebuddysync@gmail.com"
 
+            },
+
+            serviceCharges: [{
+                    service: "Service Fee",
+                    amount: 300
+                },
+
+                {
+                    service: "labour % hours at $75/hr",
+                    amount: 900
+                },
+
+                {
+                    service: "New Client Discount",
+                    amount: -60
+                },
+
+                {
+                    service: "Tax (4.25% after discount)",
+                    amount: 100
+                }
+            ]
 
         };
 
-        ejs.renderFile('views/invoice.ejs', data, async (err, htmlContent) => {
+        ejs.renderFile('views/invoice.ejs', data, async(err, htmlContent) => {
             if (err) {
                 console.log(err)
                 return res.status(500).send('Internal Server Error');
